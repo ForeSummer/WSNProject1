@@ -11,11 +11,12 @@ enum {
     TIMER_PERIOD_MILLI = 250
 };
 
-typedef nx_struct sense_msg {
+typedef nx_struct sense_msg_t {
 	nx_uint16_t nodeID;
 	nx_uint16_t temp;
 	nx_uint16_t humid;
 	nx_uint16_t light;
-} sense_msg_t;
+	nx_uint16_t seq;
+}sense_msg_t;
 
 #endif

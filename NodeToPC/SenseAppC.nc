@@ -8,18 +8,21 @@
 configuration SenseAppC {} 
 implementation { 
   
-  components SenseC, MainC, LedsC, new TimerMilliC();
-  components new SensirionSht11C() as SSensor;
-  components new HamamatsuS1087ParC() as HSensor;
+  components SenseC, MainC, LedsC;
   components SerialActiveMessageC as AM;
+
+	//components new AMSenderC(AM_MSG);
+	components ActiveMessageC;
+  components new AMReceiverC(AM_MSG);
 
   SenseC.Boot -> MainC;
   SenseC.Leds -> LedsC;
-  SenseC.Timer -> TimerMilliC;
-  SenseC.Read1 -> SSensor.Temperature;
-  SenseC.Read2 -> SSensor.Humidity;
-  SenseC.Read3 -> HSensor;
-  SenseC.Control -> AM;
+  SenseC.Control2 -> AM;
   SenseC.AMSend -> AM.AMSend[AM_SENSE_MSG_T];
   SenseC.Packet -> AM;
+
+	SenseC.Control1 -> ActiveMessageC;
+	//SenseC.Packet -> AMSenderC;
+	//SenseC.AMSend -> AMSenderC;
+  SenseC.Receive -> AMReceiverC;
 }

@@ -6,7 +6,7 @@
 #include "Timer.h"
 #include "Sense.h"
 
-#define SAMPLING_FREQUENCY 1000
+#define SAMPLING_FREQUENCY 100
 
 module SenseC {
   uses {
@@ -43,14 +43,14 @@ implementation {
   }
 
   task void sendData() {
-  	while(busy){
-  	}
+  	while (busy) {}
 		if (!busy) {
 			sense_msg_t* this_pkt = (sense_msg_t*)(call Packet.getPayload(&packet, NULL));
-			this_pkt -> nodeID = 1;
-			this_pkt -> temp = cur_temp;
-			this_pkt -> humid = cur_humid;
-			this_pkt -> light = cur_light;
+			this_pkt->nodeID = 1;
+			this_pkt->temp = cur_temp;
+			this_pkt->humid = cur_humid;
+			this_pkt->light = cur_light;
+			this_pkt->seq = ++counter;
 			if(call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(sense_msg_t)) == SUCCESS) {
 				busy = TRUE;
 				call Leds.led0Toggle();
@@ -86,8 +86,6 @@ implementation {
   	}
   }
 
-  
-
   event void Control.startDone(error_t err) {
 		if (err == SUCCESS) {
 			call Timer.startPeriodic(SAMPLING_FREQUENCY);
@@ -98,23 +96,21 @@ implementation {
 
   event void Control.stopDone(error_t err) {}
 
-
-
 	event void AMSend.sendDone(message_t* msg, error_t error) {
-		if(&packet == msg) {
+		//if(&packet == msg) {
 			busy = FALSE;
-		}
+		//}
 	}
 
 	task void sendJumpData() {
-		while(busy){
-		}
+		while (busy) {}
 		if (!busy) {
-			sense_msg_t* this_pkt = recv_pkt;
-			this_pkt -> nodeID = 2;
-			this_pkt -> temp = cur_temp;
-			this_pkt -> humid = cur_humid;
-			this_pkt -> light = cur_light;
+			sense_msg_t* this_pkt = (sense_msg_t*)call Packet.getPayload(&packet, sizeof(sense_msg_t));
+			this_pkt->nodeID = 2;
+			this_pkt->temp = recv_pkt->temp;
+			this_pkt->humid = recv_pkt->humid;
+			this_pkt->light = recv_pkt->light;
+			this_pkt->seq = recv_pkt->seq;
 			if(call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(sense_msg_t)) == SUCCESS) {
 				busy = TRUE;
 				call Leds.led2Toggle();
@@ -132,10 +128,5 @@ implementation {
 		}
 		return msg;
 	}
-  
 }
-
-
-
-
 

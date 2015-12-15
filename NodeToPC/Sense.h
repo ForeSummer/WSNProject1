@@ -7,14 +7,15 @@
 #define SENSE_H
 
 typedef nx_struct sense_msg_t {
+	nx_uint16_t nodeID;
 	nx_uint16_t temp;
 	nx_uint16_t humid;
 	nx_uint16_t light;
+	nx_uint16_t seq;
 }sense_msg_t;
 
 enum {
-	NREADINGS = 1,
-  DEFAULT_INTERVAL = 256,
+  AM_MSG = 6,
   AM_SENSE_MSG_T = 0x89,
 };
 

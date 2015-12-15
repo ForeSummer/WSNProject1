@@ -10,89 +10,85 @@
 
 module SenseC {
   uses {
-  	interface SplitControl as Control;
+  	interface SplitControl as Control1;
+  	interface SplitControl as Control2;
   	interface AMSend;
   	interface Packet;
     interface Boot;
     interface Leds;
-    interface Timer<TMilli>;
-    interface Read<uint16_t> as Read1;
-    interface Read<uint16_t> as Read2;
-    interface Read<uint16_t> as Read3;
+
+    interface Receive;
   }
 }
 implementation {
 
 	message_t packet;
+	sense_msg_t* recv_pkt;
 
-	bool locked = FALSE;
-	uint16_t senseData[3] = {0, 0, 0};
+	bool busy = FALSE;
+	uint16_t senseData[5] = {0, 0, 0, 0, 0};
   
   event void Boot.booted() {
-  	call Control.start();
+  	call Control1.start();
+  	call Control2.start();
   }
 
-  event void Timer.fired() {
-    call Read1.read();
-    call Read2.read();
-    call Read3.read();
-    
-  	if (!locked) {
-			sense_msg_t* m = (sense_msg_t*)call Packet.getPayload(&packet, sizeof(sense_msg_t));
-			
-			if (m == NULL || 
-					call Packet.maxPayloadLength() < sizeof(sense_msg_t)) {
-				return;
-			}
-
-			m->temp = senseData[0];
-			m->humid = senseData[1];
-			m->light = senseData[2];
+  task void sendData() {
+		while (busy) {}
+		if (!busy) {
+			sense_msg_t* this_pkt = (sense_msg_t*)call Packet.getPayload(&packet, sizeof(sense_msg_t));
+			this_pkt->nodeID = senseData[0];
+			this_pkt->temp = senseData[1];
+			this_pkt->humid = senseData[2];
+			this_pkt->light = senseData[3];
+			this_pkt->seq = senseData[4];
 
 			if (call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(sense_msg_t)) == SUCCESS) {
-				locked = TRUE;
+				busy = TRUE;
+				call Leds.led2Toggle();
 			}
-  	}
+		}
   }
-
-  event void Read1.readDone(error_t result, uint16_t data) {
-  	if (result == SUCCESS) {
-			call Leds.led0On();
-			senseData[0] = data;
-  	} else {
-			call Leds.led0Off();
-  	}
-  }
-
-  event void Read2.readDone(error_t result, uint16_t data) {
-		if (result == SUCCESS) {
-			call Leds.led1On();
-			senseData[1] = data;
-  	} else {
-			call Leds.led1Off();
-  	}
-  }
-
-  event void Read3.readDone(error_t result, uint16_t data) {
-  	if (result == SUCCESS) {
-			call Leds.led2On();
-			senseData[2] = data;
-  	} else {
-			call Leds.led2Off();
-  	}
-  }
-
+  
 	event void AMSend.sendDone(message_t* bufPtr, error_t error) {
 		if (&packet == bufPtr) {
-			locked = FALSE;
+			busy = FALSE;
 		}
 	}
 
-  event void Control.startDone(error_t err) {
+  event void Control1.startDone(error_t err) {
 		if (err == SUCCESS) {
-			call Timer.startPeriodic(SAMPLING_FREQUENCY);
+			
+		} else {
+			call Control1.start();
 		}
   }
 
-  event void Control.stopDone(error_t err) {}
+  event void Control1.stopDone(error_t err) {}
+
+  event void Control2.startDone(error_t err) {
+		if (err == SUCCESS) {
+			
+		} else {
+			call Control2.start();
+		}
+  }
+
+  event void Control2.stopDone(error_t err) {}
+
+  event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len) {
+		if (len == sizeof(sense_msg_t)) {
+			recv_pkt = (sense_msg_t*)payload;
+			senseData[0] = recv_pkt->nodeID;
+			senseData[1] = recv_pkt->temp;
+			senseData[2] = recv_pkt->humid;
+			senseData[3] = recv_pkt->light;
+			senseData[4] = recv_pkt->seq;
+			if (recv_pkt->nodeID == 0x1 ||
+					recv_pkt->nodeID == 0x2) {
+				post sendData();
+			}
+		}
+		return msg;
+  }
 }

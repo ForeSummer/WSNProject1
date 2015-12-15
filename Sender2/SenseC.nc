@@ -6,7 +6,7 @@
 #include "Timer.h"
 #include "Sense.h"
 
-#define SAMPLING_FREQUENCY 1000
+#define SAMPLING_FREQUENCY 100
 
 module SenseC {
   uses {
@@ -28,7 +28,6 @@ implementation {
 
 	message_t packet;
 
-	bool locked = FALSE;
 	bool busy = FALSE;
 
 	uint16_t cur_temp = 0;
@@ -42,17 +41,13 @@ implementation {
   }
 
   task void sendData() {
-		counter++;
-		cur_temp = counter;
-		cur_humid = counter;
-		cur_light = counter;
-
 		if (!busy) {
 			sense_msg_t* this_pkt = (sense_msg_t*)(call Packet.getPayload(&packet, NULL));
-			this_pkt -> temp = cur_temp;
-			this_pkt -> humid = cur_humid;
-			this_pkt -> light = cur_light;
-			this_pkt -> nodeID = -1;
+			this_pkt->nodeID = -1;
+			this_pkt->temp = cur_temp;
+			this_pkt->humid = cur_humid;
+			this_pkt->light = cur_light;
+			this_pkt->seq = ++counter;
 			if(call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(sense_msg_t)) == SUCCESS) {
 				busy = TRUE;
 				call Leds.led0Toggle();
@@ -69,6 +64,9 @@ implementation {
 
   event void Read1.readDone(error_t result, uint16_t data) {
   	if (result == SUCCESS) {
+  		if (data > 0x2000) {
+				call Leds.led2Toggle();
+  		}
 			cur_temp = data;
   	} else {
   	}
@@ -76,20 +74,18 @@ implementation {
 
   event void Read2.readDone(error_t result, uint16_t data) {
 		if (result == SUCCESS) {
-			cur_temp = data;
+			cur_humid = data;
   	} else {
   	}
   }
 
   event void Read3.readDone(error_t result, uint16_t data) {
   	if (result == SUCCESS) {
-			cur_temp = data;
+			cur_light = data;
   	} else {
   	}
   }
-
   
-
   event void Control.startDone(error_t err) {
 		if (err == SUCCESS) {
 			call Timer.startPeriodic(SAMPLING_FREQUENCY);
@@ -99,8 +95,6 @@ implementation {
   }
 
   event void Control.stopDone(error_t err) {}
-
-
 
 	event void AMSend.sendDone(message_t* msg, error_t error) {
 		if(&packet == msg) {
@@ -115,10 +109,5 @@ implementation {
 		}
 		return msg;
 	}
-  
 }
-
-
-
-
 
