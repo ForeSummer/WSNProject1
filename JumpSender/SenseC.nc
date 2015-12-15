@@ -43,7 +43,7 @@ implementation {
   }
 
   task void sendData() {
-  	while (busy) {}
+  	//while (busy) {}
 		if (!busy) {
 			sense_msg_t* this_pkt = (sense_msg_t*)(call Packet.getPayload(&packet, NULL));
 			this_pkt->nodeID = 1;
@@ -55,6 +55,8 @@ implementation {
 				busy = TRUE;
 				call Leds.led0Toggle();
 			}
+		} else {
+			post sendData();		
 		}
   }
 
@@ -103,7 +105,7 @@ implementation {
 	}
 
 	task void sendJumpData() {
-		while (busy) {}
+		//while (busy) {}
 		if (!busy) {
 			sense_msg_t* this_pkt = (sense_msg_t*)call Packet.getPayload(&packet, sizeof(sense_msg_t));
 			this_pkt->nodeID = 2;
@@ -111,10 +113,14 @@ implementation {
 			this_pkt->humid = recv_pkt->humid;
 			this_pkt->light = recv_pkt->light;
 			this_pkt->seq = recv_pkt->seq;
+			
+
 			if(call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(sense_msg_t)) == SUCCESS) {
 				busy = TRUE;
 				call Leds.led2Toggle();
 			}
+		} else {
+			post sendJumpData();
 		}
 	}
 
