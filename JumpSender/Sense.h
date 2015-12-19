@@ -8,7 +8,8 @@
 
 enum {
     AM_MSG = 6,
-    TIMER_PERIOD_MILLI = 250
+    TIMER_PERIOD_MILLI = 250,
+    AM_SENSE_MSG_T = 0x89,
 };
 
 typedef nx_struct sense_msg_t {
