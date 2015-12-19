@@ -66,8 +66,11 @@ public class MsgReader implements net.tinyos.message.MessageListener {
     try {
 		  BufferedWriter bw = new BufferedWriter(new FileWriter(new File("./result.txt"), true));
 		  String[] values = Utils.getValue(message.toString());
+		  if (!values[6].equals("a849b25c")) {
+				return;
+		  }
 		  int[] numbers = Utils.getNumbers(values);
-		  int length = values.length;
+		  int length = numbers.length;
 		  for (int i = 0; i < length; ++i) {
 				bw.write(numbers[i] + "\t");
 		  }
@@ -92,26 +95,26 @@ public class MsgReader implements net.tinyos.message.MessageListener {
     Vector v = new Vector();
     if (args.length > 0) {
       for (int i = 0; i < args.length; i++) {
-	if (args[i].equals("-comm")) {
-	  source = args[++i];
-	}
-	else {
-	  String className = args[i];
-	  try {
-	    Class c = Class.forName(className);
-	    Object packet = c.newInstance();
-	    Message msg = (Message)packet;
-	    if (msg.amType() < 0) {
-		System.err.println(className + " does not have an AM type - ignored");
-	    }
-	    else {
-		v.addElement(msg);
-	    }
-	  }
-	  catch (Exception e) {
-	    System.err.println(e);
-	  }
-	}
+				if (args[i].equals("-comm")) {
+	  			source = args[++i];
+				}
+				else {
+	  			String className = args[i];
+	  			try {
+	    			Class c = Class.forName(className);
+	    			Object packet = c.newInstance();
+	    			Message msg = (Message)packet;
+	    			if (msg.amType() < 0) {
+							System.err.println(className + " does not have an AM type - ignored");
+	    			}
+	   	 			else {
+							v.addElement(msg);
+	    			}
+	  			}
+	  			catch (Exception e) {
+	    			System.err.println(e);
+	  			}
+				}
       }
     }
     else if (args.length != 0) {

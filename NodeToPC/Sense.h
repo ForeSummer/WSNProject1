@@ -13,6 +13,7 @@ typedef nx_struct sense_msg_t {
 	nx_uint16_t light;
 	nx_uint16_t seq;
 	nx_uint32_t time;
+	nx_uint32_t token;
 }sense_msg_t;
 
 enum {

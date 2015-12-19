@@ -27,19 +27,22 @@ public class JChartPanels {
 
 	private ChartPanel[] chartPanels = new ChartPanel[6];
 
+	private final String[] titles = {
+		"Node 1's Temprature",
+		"Node 2's Temprature",
+		"Node 1's Humidity",
+		"Node 2's Humidity",
+		"Node 1's Illumination",
+		"Node 2's Illumination"
+	};
+
 	public JChartPanels() {
 		XYDataset[] datasets = createXYDataset("./result.txt");
 		for (int i = 0; i < 6; ++i) {
-			JFreeChart freeChart = createChart(datasets[i], "chart");
+			JFreeChart freeChart = createChart(datasets[i], titles[i]);
 			chartPanels[i] = new ChartPanel(freeChart);
 			//saveAsFile(freeChart, "./lineXY" + i + ".png", 2000, 500);
 		}
-		/*chartPanels[0].setBounds(0, 0, 400, 300);
-		chartPanels[2].setBounds(400, 0, 400, 300);
-		chartPanels[4].setBounds(800, 0, 400, 300);
-		chartPanels[1].setBounds(0, 300, 400, 300);
-		chartPanels[3].setBounds(400, 300, 400, 300);
-		chartPanels[5].setBounds(800, 300, 400, 300);*/
 	}
 
 	public ChartPanel getChartPanel(int i) {
@@ -107,15 +110,16 @@ public class JChartPanels {
 				int temp = Integer.valueOf(nums[2], 10);
 				int humid = Integer.valueOf(nums[3], 10);
 				int ill = Integer.valueOf(nums[4], 10);
+				int time = Integer.valueOf(nums[5], 10);
 
 				if (ID == 1) {
-					xyseries1.add(seqNo, temp);
-					xyseries3.add(seqNo, humid);
-					xyseries5.add(seqNo, ill);
+					xyseries1.add(time, temp);
+					xyseries3.add(time, humid);
+					xyseries5.add(time, ill);
 				} else {
-					xyseries2.add(seqNo, temp);
-					xyseries4.add(seqNo, humid);
-					xyseries6.add(seqNo, ill);
+					xyseries2.add(time, temp);
+					xyseries4.add(time, humid);
+					xyseries6.add(time, ill);
 				}
 			}
 			br.close();

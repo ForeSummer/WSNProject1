@@ -16,7 +16,7 @@ module SenseC {
   	interface AMPacket;
     interface Boot;
     interface Leds;
-    interface Timer<TMilli>;
+    interface Timer<TMilli> as Timer;
     interface Read<uint16_t> as Read1;
     interface Read<uint16_t> as Read2;
     interface Read<uint16_t> as Read3;
@@ -51,7 +51,8 @@ implementation {
 			this_pkt->humid = cur_humid;
 			this_pkt->light = cur_light;
 			this_pkt->seq = ++counter;
-			this_pkt->time = Timer.getNow();
+			this_pkt->time = call Timer.getNow();
+			this_pkt->token = 0xa849b25c;
 			if(call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(sense_msg_t)) == SUCCESS) {
 				busy = TRUE;
 				call Leds.led0Toggle();
@@ -114,7 +115,8 @@ implementation {
 			this_pkt->humid = recv_pkt->humid;
 			this_pkt->light = recv_pkt->light;
 			this_pkt->seq = recv_pkt->seq;
-			
+			this_pkt->time = recv_pkt->time;
+			this_pkt->token = recv_pkt->token;
 
 			if(call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(sense_msg_t)) == SUCCESS) {
 				busy = TRUE;

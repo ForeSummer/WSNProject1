@@ -7,12 +7,12 @@
 public class SenseMsg extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 10;
+    public static final int DEFAULT_MESSAGE_SIZE = 18;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 137;
 
-    /** Create a new SenseMsg of size 10. */
+    /** Create a new SenseMsg of size 18. */
     public SenseMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -98,6 +98,12 @@ public class SenseMsg extends net.tinyos.message.Message {
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
         s += "  [seq=0x"+Long.toHexString(get_seq())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [time=0x"+Long.toHexString(get_time())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [token=0x"+Long.toHexString(get_token())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       return s;
     }
@@ -417,6 +423,132 @@ public class SenseMsg extends net.tinyos.message.Message {
      */
     public static int sizeBits_seq() {
         return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: time
+    //   Field type: long, unsigned
+    //   Offset (bits): 80
+    //   Size (bits): 32
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'time' is signed (false).
+     */
+    public static boolean isSigned_time() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'time' is an array (false).
+     */
+    public static boolean isArray_time() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'time'
+     */
+    public static int offset_time() {
+        return (80 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'time'
+     */
+    public static int offsetBits_time() {
+        return 80;
+    }
+
+    /**
+     * Return the value (as a long) of the field 'time'
+     */
+    public long get_time() {
+        return (long)getUIntBEElement(offsetBits_time(), 32);
+    }
+
+    /**
+     * Set the value of the field 'time'
+     */
+    public void set_time(long value) {
+        setUIntBEElement(offsetBits_time(), 32, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'time'
+     */
+    public static int size_time() {
+        return (32 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'time'
+     */
+    public static int sizeBits_time() {
+        return 32;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: token
+    //   Field type: long, unsigned
+    //   Offset (bits): 112
+    //   Size (bits): 32
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'token' is signed (false).
+     */
+    public static boolean isSigned_token() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'token' is an array (false).
+     */
+    public static boolean isArray_token() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'token'
+     */
+    public static int offset_token() {
+        return (112 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'token'
+     */
+    public static int offsetBits_token() {
+        return 112;
+    }
+
+    /**
+     * Return the value (as a long) of the field 'token'
+     */
+    public long get_token() {
+        return (long)getUIntBEElement(offsetBits_token(), 32);
+    }
+
+    /**
+     * Set the value of the field 'token'
+     */
+    public void set_token(long value) {
+        setUIntBEElement(offsetBits_token(), 32, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'token'
+     */
+    public static int size_token() {
+        return (32 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'token'
+     */
+    public static int sizeBits_token() {
+        return 32;
     }
 
 }
