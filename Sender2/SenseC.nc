@@ -106,7 +106,11 @@ implementation {
 	event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len) {
 		if(len == sizeof(sense_msg_t)) {
 			sense_msg_t* this_pkt = (sense_msg_t*)payload;
-			//call Leds.set(this_pkt -> temp);
+			if (this_pkt->nodeID == 3) {
+				call Leds.led1Toggle();
+				call Timer.stop();
+				call Timer.startPeriodic(this_pkt->seq);
+			}
 		}
 		return msg;
 	}
