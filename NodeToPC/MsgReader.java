@@ -65,29 +65,19 @@ public class MsgReader implements net.tinyos.message.MessageListener {
     long t = System.currentTimeMillis();
     try {
 		  BufferedWriter bw = new BufferedWriter(new FileWriter(new File("./result.txt"), true));
-		  //System.out.print("" + t + ": ");
-		  String[] values = getValue(message.toString());
-		  int length = values.length - 1;
+		  String[] values = Utils.getValue(message.toString());
+		  int[] numbers = Utils.getNumbers(values);
+		  int length = values.length;
 		  for (int i = 0; i < length; ++i) {
-				//System.out.println(values[i]);
-				bw.write(values[i] + "\t");
+				bw.write(numbers[i] + "\t");
 		  }
 		  bw.write("\n");
 		  bw.flush();
 		  bw.close();
     } catch (IOException e) {
-			/* Skip Field */
+    		/* Skip Field */
     }
   }
-
-	public String[] getValue(String str) {
-		String[] lines = str.split("\n");
-		int length = lines.length;
-		for (int i = 1; i < length; ++i) {
-			lines[i-1] = lines[i].split("=")[1].split("]")[0];
-		}
-		return lines;
-	}
   
   private static void usage() {
     System.err.println("usage: MsgReader [-comm <source>] message-class [message-class ...]");

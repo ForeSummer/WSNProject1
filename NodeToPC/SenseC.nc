@@ -34,7 +34,6 @@ implementation {
   }
 
   task void sendData() {
-		while (busy) {}
 		if (!busy) {
 			sense_msg_t* this_pkt = (sense_msg_t*)call Packet.getPayload(&packet, sizeof(sense_msg_t));
 			this_pkt->nodeID = senseData[0];
@@ -47,6 +46,8 @@ implementation {
 				busy = TRUE;
 				call Leds.led2Toggle();
 			}
+		} else {
+			post sendData();
 		}
   }
   

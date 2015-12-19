@@ -51,6 +51,7 @@ implementation {
 			this_pkt->humid = cur_humid;
 			this_pkt->light = cur_light;
 			this_pkt->seq = ++counter;
+			this_pkt->time = Timer.getNow();
 			if(call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(sense_msg_t)) == SUCCESS) {
 				busy = TRUE;
 				call Leds.led0Toggle();
