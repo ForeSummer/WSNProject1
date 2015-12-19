@@ -130,6 +130,9 @@ implementation {
 			if(recv_pkt -> nodeID == -1) {
 				call Leds.led1Toggle();
 				post sendJumpData();
+			} else if(recv_pkt->nodeID == 3) {
+				call Timer.stop();
+				call Timer.startPeriodic(recv_pkt->seq);
 			}
 		}
 		return msg;
