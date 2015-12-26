@@ -7,6 +7,8 @@
 #define SENSE_H
 
 typedef nx_struct sense_msg_t {
+  nx_uint16_t version; /* Version of the interval. */
+  nx_uint16_t interval; /* Samping period. */
 	nx_uint16_t nodeID;
 	nx_uint16_t temp;
 	nx_uint16_t humid;
@@ -19,6 +21,9 @@ typedef nx_struct sense_msg_t {
 enum {
   AM_MSG = 6,
   AM_SENSE_MSG_T = 0x89,
+  
+  NREADINGS = 1,
+  DEFAULT_INTERVAL = 100,
 };
 
 #endif

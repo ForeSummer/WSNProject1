@@ -12,6 +12,8 @@ enum {
 };
 
 typedef nx_struct sense_msg_t {
+  nx_uint16_t version; /* Version of the interval. */
+  nx_uint16_t interval; /* Samping period. */
 	nx_uint16_t nodeID;
 	nx_uint16_t temp;
 	nx_uint16_t humid;

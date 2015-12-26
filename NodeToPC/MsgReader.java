@@ -66,13 +66,17 @@ public class MsgReader implements net.tinyos.message.MessageListener {
     try {
 		  BufferedWriter bw = new BufferedWriter(new FileWriter(new File("./result.txt"), true));
 		  String[] values = Utils.getValue(message.toString());
-		  if (!values[6].equals("a849b25c")) {
+		  //System.out.println(values[8]);
+		  if (!values[8].equals("a849b25c")) {
 				return;
 		  }
-		  int[] numbers = Utils.getNumbers(values);
-		  int length = numbers.length;
-		  for (int i = 0; i < length; ++i) {
-				bw.write(numbers[i] + "\t");
+		  if (!values[1].equals("64")) {
+				System.out.println(values[1]);
+		  }
+		  //int[] numbers = Utils.getNumbers(values);
+		  //int length = numbers.length;
+		  for (int i = 0; i < values.length; ++i) {
+				bw.write(values[i] + " ");
 		  }
 		  bw.write("\n");
 		  bw.flush();

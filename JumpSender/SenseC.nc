@@ -7,6 +7,9 @@
 #include "Sense.h"
 
 #define SAMPLING_FREQUENCY 100
+#define NODE_ZERO 633
+#define NODE_ONE 622
+#define NODE_TWO 589
 
 module SenseC {
   uses {
@@ -37,13 +40,13 @@ implementation {
 	uint16_t cur_light = 0;
 	
 	uint16_t counter = 0;
+	uint16_t version = 0, interval = 100;
   
   event void Boot.booted() {
   	call Control.start();
   }
 
   task void sendData() {
-  	//while (busy) {}
 		if (!busy) {
 			sense_msg_t* this_pkt = (sense_msg_t*)(call Packet.getPayload(&packet, NULL));
 			this_pkt->nodeID = 1;
@@ -53,7 +56,9 @@ implementation {
 			this_pkt->seq = ++counter;
 			this_pkt->time = call Timer.getNow();
 			this_pkt->token = 0xa849b25c;
-			if(call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(sense_msg_t)) == SUCCESS) {
+			this_pkt->version = version;
+			this_pkt->interval = interval;
+			if(call AMSend.send(NODE_ZERO, &packet, sizeof(sense_msg_t)) == SUCCESS) {
 				busy = TRUE;
 				call Leds.led0Toggle();
 			}
@@ -92,7 +97,7 @@ implementation {
 
   event void Control.startDone(error_t err) {
 		if (err == SUCCESS) {
-			call Timer.startPeriodic(SAMPLING_FREQUENCY);
+			call Timer.startPeriodic(interval);
 		} else {
 			call Control.start();
 		}
@@ -107,7 +112,6 @@ implementation {
 	}
 
 	task void sendJumpData() {
-		//while (busy) {}
 		if (!busy) {
 			sense_msg_t* this_pkt = (sense_msg_t*)call Packet.getPayload(&packet, sizeof(sense_msg_t));
 			this_pkt->nodeID = 2;
@@ -117,8 +121,15 @@ implementation {
 			this_pkt->seq = recv_pkt->seq;
 			this_pkt->time = recv_pkt->time;
 			this_pkt->token = recv_pkt->token;
+			this_pkt->version = recv_pkt->version;
+			this_pkt->interval = recv_pkt->interval;
 
-			if(call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(sense_msg_t)) == SUCCESS) {
+			/*if (this_pkt->interval != 0x64) {
+				call Control.stop();
+				call Leds.led1Toggle();
+			}*/
+			
+			if(call AMSend.send(NODE_ZERO, &packet, sizeof(sense_msg_t)) == SUCCESS) {
 				busy = TRUE;
 				call Leds.led2Toggle();
 			}
@@ -127,15 +138,26 @@ implementation {
 		}
 	}
 
+	task void changeFreq() {
+		if (busy) {
+			call Timer.stop();
+			call Timer.startPeriodic(interval);
+		} else {
+			post changeFreq();
+		}
+	}
+
 	event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len) {
 		if(len == sizeof(sense_msg_t)) {
 			recv_pkt = (sense_msg_t*)payload;
-			if(recv_pkt -> nodeID == -1) {
-				call Leds.led1Toggle();
+			if (recv_pkt->token != 0xa849b25c) {
+				return msg;
+			} else if (call AMPacket.source(msg) == NODE_TWO && call AMPacket.destination(msg) == NODE_ONE && recv_pkt->nodeID == -1) {
 				post sendJumpData();
 			} else if(recv_pkt->nodeID == 3) {
-				call Timer.stop();
-				call Timer.startPeriodic(recv_pkt->seq);
+				version = recv_pkt->version;
+				interval = recv_pkt->interval;
+				post changeFreq();
 			}
 		}
 		return msg;

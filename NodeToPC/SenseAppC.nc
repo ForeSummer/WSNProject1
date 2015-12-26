@@ -20,6 +20,7 @@ implementation {
   SenseC.Control2 -> AM;
   SenseC.AMSend1 -> AM.AMSend[AM_SENSE_MSG_T];
   SenseC.Packet1 -> AM;
+  SenseC.AMPacket -> AMSenderC;
 
 	SenseC.Control1 -> ActiveMessageC;
 	SenseC.Packet2 -> AMSenderC;

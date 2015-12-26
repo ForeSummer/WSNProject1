@@ -7,12 +7,12 @@
 public class SenseMsg extends net.tinyos.message.Message {
 
     /** The default size of this message type in bytes. */
-    public static final int DEFAULT_MESSAGE_SIZE = 18;
+    public static final int DEFAULT_MESSAGE_SIZE = 22;
 
     /** The Active Message type associated with this message. */
     public static final int AM_TYPE = 137;
 
-    /** Create a new SenseMsg of size 18. */
+    /** Create a new SenseMsg of size 22. */
     public SenseMsg() {
         super(DEFAULT_MESSAGE_SIZE);
         amTypeSet(AM_TYPE);
@@ -85,6 +85,12 @@ public class SenseMsg extends net.tinyos.message.Message {
     public String toString() {
       String s = "Message <SenseMsg> \n";
       try {
+        s += "  [version=0x"+Long.toHexString(get_version())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
+        s += "  [interval=0x"+Long.toHexString(get_interval())+"]\n";
+      } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
+      try {
         s += "  [nodeID=0x"+Long.toHexString(get_nodeID())+"]\n";
       } catch (ArrayIndexOutOfBoundsException aioobe) { /* Skip field */ }
       try {
@@ -111,9 +117,135 @@ public class SenseMsg extends net.tinyos.message.Message {
     // Message-type-specific access methods appear below.
 
     /////////////////////////////////////////////////////////
-    // Accessor methods for field: nodeID
+    // Accessor methods for field: version
     //   Field type: int, unsigned
     //   Offset (bits): 0
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'version' is signed (false).
+     */
+    public static boolean isSigned_version() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'version' is an array (false).
+     */
+    public static boolean isArray_version() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'version'
+     */
+    public static int offset_version() {
+        return (0 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'version'
+     */
+    public static int offsetBits_version() {
+        return 0;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'version'
+     */
+    public int get_version() {
+        return (int)getUIntBEElement(offsetBits_version(), 16);
+    }
+
+    /**
+     * Set the value of the field 'version'
+     */
+    public void set_version(int value) {
+        setUIntBEElement(offsetBits_version(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'version'
+     */
+    public static int size_version() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'version'
+     */
+    public static int sizeBits_version() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: interval
+    //   Field type: int, unsigned
+    //   Offset (bits): 16
+    //   Size (bits): 16
+    /////////////////////////////////////////////////////////
+
+    /**
+     * Return whether the field 'interval' is signed (false).
+     */
+    public static boolean isSigned_interval() {
+        return false;
+    }
+
+    /**
+     * Return whether the field 'interval' is an array (false).
+     */
+    public static boolean isArray_interval() {
+        return false;
+    }
+
+    /**
+     * Return the offset (in bytes) of the field 'interval'
+     */
+    public static int offset_interval() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the offset (in bits) of the field 'interval'
+     */
+    public static int offsetBits_interval() {
+        return 16;
+    }
+
+    /**
+     * Return the value (as a int) of the field 'interval'
+     */
+    public int get_interval() {
+        return (int)getUIntBEElement(offsetBits_interval(), 16);
+    }
+
+    /**
+     * Set the value of the field 'interval'
+     */
+    public void set_interval(int value) {
+        setUIntBEElement(offsetBits_interval(), 16, value);
+    }
+
+    /**
+     * Return the size, in bytes, of the field 'interval'
+     */
+    public static int size_interval() {
+        return (16 / 8);
+    }
+
+    /**
+     * Return the size, in bits, of the field 'interval'
+     */
+    public static int sizeBits_interval() {
+        return 16;
+    }
+
+    /////////////////////////////////////////////////////////
+    // Accessor methods for field: nodeID
+    //   Field type: int, unsigned
+    //   Offset (bits): 32
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -135,14 +267,14 @@ public class SenseMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'nodeID'
      */
     public static int offset_nodeID() {
-        return (0 / 8);
+        return (32 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'nodeID'
      */
     public static int offsetBits_nodeID() {
-        return 0;
+        return 32;
     }
 
     /**
@@ -176,7 +308,7 @@ public class SenseMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: temp
     //   Field type: int, unsigned
-    //   Offset (bits): 16
+    //   Offset (bits): 48
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -198,14 +330,14 @@ public class SenseMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'temp'
      */
     public static int offset_temp() {
-        return (16 / 8);
+        return (48 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'temp'
      */
     public static int offsetBits_temp() {
-        return 16;
+        return 48;
     }
 
     /**
@@ -239,7 +371,7 @@ public class SenseMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: humid
     //   Field type: int, unsigned
-    //   Offset (bits): 32
+    //   Offset (bits): 64
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -261,14 +393,14 @@ public class SenseMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'humid'
      */
     public static int offset_humid() {
-        return (32 / 8);
+        return (64 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'humid'
      */
     public static int offsetBits_humid() {
-        return 32;
+        return 64;
     }
 
     /**
@@ -302,7 +434,7 @@ public class SenseMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: light
     //   Field type: int, unsigned
-    //   Offset (bits): 48
+    //   Offset (bits): 80
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -324,14 +456,14 @@ public class SenseMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'light'
      */
     public static int offset_light() {
-        return (48 / 8);
+        return (80 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'light'
      */
     public static int offsetBits_light() {
-        return 48;
+        return 80;
     }
 
     /**
@@ -365,7 +497,7 @@ public class SenseMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: seq
     //   Field type: int, unsigned
-    //   Offset (bits): 64
+    //   Offset (bits): 96
     //   Size (bits): 16
     /////////////////////////////////////////////////////////
 
@@ -387,14 +519,14 @@ public class SenseMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'seq'
      */
     public static int offset_seq() {
-        return (64 / 8);
+        return (96 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'seq'
      */
     public static int offsetBits_seq() {
-        return 64;
+        return 96;
     }
 
     /**
@@ -428,7 +560,7 @@ public class SenseMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: time
     //   Field type: long, unsigned
-    //   Offset (bits): 80
+    //   Offset (bits): 112
     //   Size (bits): 32
     /////////////////////////////////////////////////////////
 
@@ -450,14 +582,14 @@ public class SenseMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'time'
      */
     public static int offset_time() {
-        return (80 / 8);
+        return (112 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'time'
      */
     public static int offsetBits_time() {
-        return 80;
+        return 112;
     }
 
     /**
@@ -491,7 +623,7 @@ public class SenseMsg extends net.tinyos.message.Message {
     /////////////////////////////////////////////////////////
     // Accessor methods for field: token
     //   Field type: long, unsigned
-    //   Offset (bits): 112
+    //   Offset (bits): 144
     //   Size (bits): 32
     /////////////////////////////////////////////////////////
 
@@ -513,14 +645,14 @@ public class SenseMsg extends net.tinyos.message.Message {
      * Return the offset (in bytes) of the field 'token'
      */
     public static int offset_token() {
-        return (112 / 8);
+        return (144 / 8);
     }
 
     /**
      * Return the offset (in bits) of the field 'token'
      */
     public static int offsetBits_token() {
-        return 112;
+        return 144;
     }
 
     /**

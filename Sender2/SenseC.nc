@@ -7,6 +7,9 @@
 #include "Sense.h"
 
 #define SAMPLING_FREQUENCY 100
+#define NODE_ZERO 633
+#define NODE_ONE 622
+#define NODE_TWO 589
 
 module SenseC {
   uses {
@@ -35,6 +38,8 @@ implementation {
 	uint16_t cur_light = 0;
 	
 	uint16_t counter = 0;
+
+	uint16_t version = 0, interval = 100;
   
   event void Boot.booted() {
   	call Control.start();
@@ -50,7 +55,15 @@ implementation {
 			this_pkt->seq = ++counter;
 			this_pkt->time = call Timer.getNow();
 			this_pkt->token = 0xa849b25c;
-			if(call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(sense_msg_t)) == SUCCESS) {
+			this_pkt->version = version;
+			this_pkt->interval = interval;
+			
+			if (interval == 1) {
+				call Leds.led0Toggle();
+				call Control.stop();
+			}
+				
+			if(call AMSend.send(NODE_ONE, &packet, sizeof(sense_msg_t)) == SUCCESS) {
 				busy = TRUE;
 				call Leds.led0Toggle();
 			}
@@ -66,9 +79,6 @@ implementation {
 
   event void Read1.readDone(error_t result, uint16_t data) {
   	if (result == SUCCESS) {
-  		if (data > 0x2000) {
-				call Leds.led2Toggle();
-  		}
 			cur_temp = data;
   	} else {
   	}
@@ -90,7 +100,7 @@ implementation {
   
   event void Control.startDone(error_t err) {
 		if (err == SUCCESS) {
-			call Timer.startPeriodic(SAMPLING_FREQUENCY);
+			call Timer.startPeriodic(interval);
 		} else {
 			call Control.start();
 		}
@@ -104,13 +114,27 @@ implementation {
 		}
 	}
 
+	task void changeFreq() {
+		if (busy) {
+			call Leds.led1Toggle();
+			call Timer.stop();
+			call Timer.startPeriodic(interval);
+		} else {
+			post changeFreq();
+		}
+	}
+
 	event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len) {
-		if(len == sizeof(sense_msg_t)) {
+		if(call AMPacket.source(msg) == NODE_ZERO && len == sizeof(sense_msg_t)) {
 			sense_msg_t* this_pkt = (sense_msg_t*)payload;
-			if (this_pkt->nodeID == 3) {
-				call Leds.led1Toggle();
+			if (this_pkt->token != 0xa849b25c) {
+				return msg;
+			} else if (this_pkt->nodeID == 3) {
+				version = this_pkt->version;
+				interval = this_pkt->interval;
+				//post changeFreq();
 				call Timer.stop();
-				call Timer.startPeriodic(this_pkt->seq);
+				call Timer.startPeriodic(interval);
 			}
 		}
 		return msg;
