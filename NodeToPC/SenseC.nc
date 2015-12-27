@@ -121,18 +121,20 @@ implementation {
 
   event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len) {
 		if (len == sizeof(sense_msg_t)) {
-			recv_pkt = (sense_msg_t*)payload;
-			if (recv_pkt->token != 0xa849b25c) {
+			sense_msg_t* tmp_pkt = (sense_msg_t*)payload;
+			if (tmp_pkt->token != 0xa849b25c) {
 				return msg;
-			} else if (recv_pkt->nodeID == 0x3) {
+			} else if (tmp_pkt->nodeID == 0x3) {
+				recv_pkt = (sense_msg_t*)payload;
 				version = recv_pkt->version;
 				interval = recv_pkt->interval;
 				post sendChangeFreq();
 			} else if (call AMPacket.destination(msg) == NODE_ZERO) {
-				if (call AMPacket.source(msg) == NODE_ONE && (recv_pkt->nodeID == 0x1 || recv_pkt->nodeID == 0x2)) {
-					if (recv_pkt->interval != interval) {
+				if (call AMPacket.source(msg) == NODE_ONE && (tmp_pkt->nodeID == 0x1 || tmp_pkt->nodeID == 0x2)) {
+					if (tmp_pkt->interval != interval) {
 						return msg;
 					}
+					recv_pkt = (sense_msg_t*)payload;
 					curNodeID = recv_pkt->nodeID;
 					curTemp = recv_pkt->temp;
 					curHumid = recv_pkt->humid;

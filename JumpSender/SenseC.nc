@@ -149,12 +149,14 @@ implementation {
 
 	event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len) {
 		if(len == sizeof(sense_msg_t)) {
-			recv_pkt = (sense_msg_t*)payload;
-			if (recv_pkt->token != 0xa849b25c) {
+			sense_msg_t* tmp_pkt = (sense_msg_t*)payload;
+			if (tmp_pkt->token != 0xa849b25c) {
 				return msg;
-			} else if (call AMPacket.source(msg) == NODE_TWO && call AMPacket.destination(msg) == NODE_ONE && recv_pkt->nodeID == -1) {
+			} else if (call AMPacket.source(msg) == NODE_TWO && call AMPacket.destination(msg) == NODE_ONE && tmp_pkt->nodeID == -1) {
+				recv_pkt = (sense_msg_t*)payload;
 				post sendJumpData();
-			} else if(recv_pkt->nodeID == 3) {
+			} else if(tmp_pkt->nodeID == 3) {
+				recv_pkt = (sense_msg_t*)payload;
 				version = recv_pkt->version;
 				interval = recv_pkt->interval;
 				post changeFreq();
