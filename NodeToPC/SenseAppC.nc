@@ -5,9 +5,9 @@
 
 #include "Sense.h"
 
-configuration SenseAppC {} 
-implementation { 
-  
+configuration SenseAppC {}
+implementation {
+
   components SenseC, MainC, LedsC;
   components SerialActiveMessageC as AM;
 

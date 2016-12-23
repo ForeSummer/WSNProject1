@@ -36,11 +36,11 @@ implementation {
 	uint16_t cur_temp = 0;
 	uint16_t cur_humid = 0;
 	uint16_t cur_light = 0;
-	
+
 	uint16_t counter = 0;
 
 	uint16_t version = 0, interval = 100;
-  
+
   event void Boot.booted() {
   	call Control.start();
   }
@@ -57,13 +57,13 @@ implementation {
 			this_pkt->token = 0xa849b25c;
 			this_pkt->version = version;
 			this_pkt->interval = interval;
-			
+
 			if (interval == 1) {
 				call Leds.led0Toggle();
 				call Control.stop();
 			}
-				
-			if(call AMSend.send(NODE_ONE, &packet, sizeof(sense_msg_t)) == SUCCESS) {
+
+			if(call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(sense_msg_t)) == SUCCESS) {
 				busy = TRUE;
 				call Leds.led0Toggle();
 			}
@@ -97,7 +97,7 @@ implementation {
   	} else {
   	}
   }
-  
+
   event void Control.startDone(error_t err) {
 		if (err == SUCCESS) {
 			call Timer.startPeriodic(interval);
@@ -125,7 +125,7 @@ implementation {
 	}
 
 	event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len) {
-		if(call AMPacket.source(msg) == NODE_ZERO && len == sizeof(sense_msg_t)) {
+		if(len == sizeof(sense_msg_t)) {
 			sense_msg_t* this_pkt = (sense_msg_t*)payload;
 			if (this_pkt->token != 0xa849b25c) {
 				return msg;
@@ -140,4 +140,3 @@ implementation {
 		return msg;
 	}
 }
-

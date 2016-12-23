@@ -6,11 +6,11 @@
 #include <Timer.h>
 #include "Sense.h"
 
-configuration SenseAppC 
-{ 
-} 
-implementation { 
-  
+configuration SenseAppC
+{
+}
+implementation {
+
   components SenseC, MainC, LedsC, new TimerMilliC();
   components new SensirionSht11C() as SSensor;
   components new HamamatsuS1087ParC() as HSensor;

@@ -38,10 +38,10 @@ implementation {
 	uint16_t cur_temp = 0;
 	uint16_t cur_humid = 0;
 	uint16_t cur_light = 0;
-	
+
 	uint16_t counter = 0;
 	uint16_t version = 0, interval = 100;
-  
+
   event void Boot.booted() {
   	call Control.start();
   }
@@ -58,12 +58,12 @@ implementation {
 			this_pkt->token = 0xa849b25c;
 			this_pkt->version = version;
 			this_pkt->interval = interval;
-			if(call AMSend.send(NODE_ZERO, &packet, sizeof(sense_msg_t)) == SUCCESS) {
+			if(call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(sense_msg_t)) == SUCCESS) {
 				busy = TRUE;
 				call Leds.led0Toggle();
 			}
 		} else {
-			post sendData();		
+			post sendData();
 		}
   }
 
@@ -128,8 +128,8 @@ implementation {
 				call Control.stop();
 				call Leds.led1Toggle();
 			}*/
-			
-			if(call AMSend.send(NODE_ZERO, &packet, sizeof(sense_msg_t)) == SUCCESS) {
+
+			if(call AMSend.send(AM_BROADCAST_ADDR, &packet, sizeof(sense_msg_t)) == SUCCESS) {
 				busy = TRUE;
 				call Leds.led2Toggle();
 			}
@@ -152,7 +152,7 @@ implementation {
 			sense_msg_t* tmp_pkt = (sense_msg_t*)payload;
 			if (tmp_pkt->token != 0xa849b25c) {
 				return msg;
-			} else if (call AMPacket.source(msg) == NODE_TWO && call AMPacket.destination(msg) == NODE_ONE && tmp_pkt->nodeID == -1) {
+			} else if (tmp_pkt->nodeID == -1) {
 				recv_pkt = (sense_msg_t*)payload;
 				post sendJumpData();
 			} else if(tmp_pkt->nodeID == 3) {
@@ -165,4 +165,3 @@ implementation {
 		return msg;
 	}
 }
-
